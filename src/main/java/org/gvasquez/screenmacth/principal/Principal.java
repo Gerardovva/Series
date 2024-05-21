@@ -39,13 +39,13 @@ public class Principal {
         //temporadas.forEach(System.out::println);
 
         //mostrar solo el titulo de los episodios para las temporadas
-        /*
+
         for (int i = 0; i < datos.totalDeTemporadas(); i++) {
             List<DatosEpisodio> episodiosTemporadas = temporadas.get(i).episodios();
             for (int j = 0; j < episodiosTemporadas.size(); j++) {
                 System.out.println(episodiosTemporadas.get(j).titulo());
             }
-        }*/
+        }
         //temporadas.forEach(t -> t.episodios().forEach(e -> System.out.println(e.titulo())));
         // System.out.println(temporadas);
 
@@ -56,7 +56,7 @@ public class Principal {
                 .flatMap(t -> t.episodios().stream()).collect(Collectors.toList());
 
         //top 5 episodios
-       /* datosEpisodios.stream()
+       datosEpisodios.stream()
                 .filter(e -> !e.evaluacion().equalsIgnoreCase("N/A"))
                 //  .peek(e -> System.out.println("primer filtro (N/A)" +e))
                 .sorted(Comparator.comparing(DatosEpisodio::evaluacion).reversed())
@@ -64,7 +64,7 @@ public class Principal {
                 .limit(5)
                 .map(e -> e.titulo().toUpperCase())
                 //  .peek(e -> System.out.println("tercer filtro mayusculas"+e))
-                .forEach(System.out::println); */
+                .forEach(System.out::println);
 
 
         //conviertiendo los datos a una lista del tipo episodio
@@ -76,7 +76,7 @@ public class Principal {
         //episodios.forEach(System.out::println);
 
         //busqueda de episodios a partir de x año
-      /*  System.out.print("Indica el año a partir del cual deseas ver los episodios: ");
+        System.out.print("Indica el año a partir del cual deseas ver los episodios: ");
         int fecha = sc.nextInt();
         sc.nextLine();
 
@@ -90,10 +90,10 @@ public class Principal {
                             + " Episodio " + e.getTitulo()
                             + " Fecha de lanzamiento " + e.getFecha().format(dtf));
                 });
-        */
+
 
         //busca episodios por pedazo del titulo
-   /*     System.out.print("Escriba el titulo del episodio que desea ver: ");
+        System.out.print("Escriba el titulo del episodio que desea ver: ");
         String pedazoTitulo=sc.nextLine();
 
         Optional<Episodio> episodioBuscado = episodios.stream()
@@ -104,7 +104,7 @@ public class Principal {
             System.out.println("los datos son : "+episodioBuscado.get());
         }else {
             System.out.println("episodio no encontrado");
-        }*/
+        }
 
 
         Map<Integer,Double> evaluacionesPorTemporada = episodios.stream()
