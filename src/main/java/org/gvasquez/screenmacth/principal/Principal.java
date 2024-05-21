@@ -9,10 +9,7 @@ import org.gvasquez.screenmacth.service.ConvierteDatos;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class Principal {
@@ -59,11 +56,16 @@ public class Principal {
                 .flatMap(t -> t.episodios().stream()).collect(Collectors.toList());
 
         //top 5 episodios
-        datosEpisodios.stream()
+       /* datosEpisodios.stream()
                 .filter(e -> !e.evaluacion().equalsIgnoreCase("N/A"))
+                //  .peek(e -> System.out.println("primer filtro (N/A)" +e))
                 .sorted(Comparator.comparing(DatosEpisodio::evaluacion).reversed())
+                // .peek(e -> System.out.println("ordenacion de mayor a menor" +e))
                 .limit(5)
-                .forEach(System.out::println);
+                .map(e -> e.titulo().toUpperCase())
+                //  .peek(e -> System.out.println("tercer filtro mayusculas"+e))
+                .forEach(System.out::println); */
+
 
         //conviertiendo los datos a una lista del tipo episodio
         List<Episodio> episodios = temporadas.stream()
@@ -71,11 +73,11 @@ public class Principal {
                         .map(d -> new Episodio(t.numero(), d)))
                 .collect(Collectors.toList());
 
-        episodios.forEach(System.out::println);
+        //episodios.forEach(System.out::println);
 
         //busqueda de episodios a partir de x año
-        System.out.print("Indica el año a partir del cual deseas ver los episodios: ");
-        var fecha = sc.nextInt();
+      /*  System.out.print("Indica el año a partir del cual deseas ver los episodios: ");
+        int fecha = sc.nextInt();
         sc.nextLine();
 
         LocalDate fechaBusqueda = LocalDate.of(fecha, 1, 1);
@@ -88,6 +90,34 @@ public class Principal {
                             + " Episodio " + e.getTitulo()
                             + " Fecha de lanzamiento " + e.getFecha().format(dtf));
                 });
+        */
+
+        //busca episodios por pedazo del titulo
+   /*     System.out.print("Escriba el titulo del episodio que desea ver: ");
+        String pedazoTitulo=sc.nextLine();
+
+        Optional<Episodio> episodioBuscado = episodios.stream()
+                .filter(e -> e.getTitulo().toUpperCase().contains(pedazoTitulo.toUpperCase()))
+                .findFirst();
+        if (episodioBuscado.isPresent()){
+            System.out.println("Episodio encontrado");
+            System.out.println("los datos son : "+episodioBuscado.get());
+        }else {
+            System.out.println("episodio no encontrado");
+        }*/
+
+
+        Map<Integer,Double> evaluacionesPorTemporada = episodios.stream()
+                .filter(e -> e.getEvaluacion()>0.0)
+                .collect(Collectors.groupingBy(Episodio::getTemporada,
+                        Collectors.averagingDouble(Episodio::getEvaluacion)));
+        System.out.println(evaluacionesPorTemporada);
+        DoubleSummaryStatistics est=episodios.stream()
+                .filter(e-> e.getEvaluacion()>0.0)
+                .collect(Collectors.summarizingDouble(Episodio::getEvaluacion));
+        System.out.println("Media de las evaluaciones "+est.getAverage());
+        System.out.println("Episodio mejor evaluado "+est.getMax());
+        System.out.println("Episodio peor evaluado "+est.getMin());
 
 
     }//cierre metodo
