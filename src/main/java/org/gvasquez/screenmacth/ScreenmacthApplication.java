@@ -3,6 +3,7 @@ package org.gvasquez.screenmacth;
 import org.gvasquez.screenmacth.model.DatosEpisodio;
 import org.gvasquez.screenmacth.model.DatosSerie;
 import org.gvasquez.screenmacth.model.DatosTemporadas;
+import org.gvasquez.screenmacth.principal.EjemploStreams;
 import org.gvasquez.screenmacth.principal.Principal;
 import org.gvasquez.screenmacth.service.ConsumoApi;
 import org.gvasquez.screenmacth.service.ConvierteDatos;
@@ -24,6 +25,8 @@ public class ScreenmacthApplication implements CommandLineRunner {
     public void run(String... args) throws Exception {
         Principal principal= new Principal();
         principal.muestraElMenu();
+       /* EjemploStreams streams = new EjemploStreams();
+        streams.muestraEjemplo();*/
     }
 
 

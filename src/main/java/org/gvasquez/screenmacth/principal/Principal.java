@@ -3,12 +3,17 @@ package org.gvasquez.screenmacth.principal;
 import org.gvasquez.screenmacth.model.DatosEpisodio;
 import org.gvasquez.screenmacth.model.DatosSerie;
 import org.gvasquez.screenmacth.model.DatosTemporadas;
+import org.gvasquez.screenmacth.model.Episodio;
 import org.gvasquez.screenmacth.service.ConsumoApi;
 import org.gvasquez.screenmacth.service.ConvierteDatos;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Scanner;
+import java.util.stream.Collectors;
 
 public class Principal {
 
@@ -44,9 +49,47 @@ public class Principal {
                 System.out.println(episodiosTemporadas.get(j).titulo());
             }
         }*/
-        temporadas.forEach(t -> t.episodios().forEach(e -> System.out.println(e.titulo())));
-       // System.out.println(temporadas);
+        //temporadas.forEach(t -> t.episodios().forEach(e -> System.out.println(e.titulo())));
+        // System.out.println(temporadas);
 
-    }
+
+        //convertir todas las informaciones a una lista de tipo datosepisodio
+        System.out.println("Top 5 episodios");
+        List<DatosEpisodio> datosEpisodios = temporadas.stream()
+                .flatMap(t -> t.episodios().stream()).collect(Collectors.toList());
+
+        //top 5 episodios
+        datosEpisodios.stream()
+                .filter(e -> !e.evaluacion().equalsIgnoreCase("N/A"))
+                .sorted(Comparator.comparing(DatosEpisodio::evaluacion).reversed())
+                .limit(5)
+                .forEach(System.out::println);
+
+        //conviertiendo los datos a una lista del tipo episodio
+        List<Episodio> episodios = temporadas.stream()
+                .flatMap(t -> t.episodios().stream()
+                        .map(d -> new Episodio(t.numero(), d)))
+                .collect(Collectors.toList());
+
+        episodios.forEach(System.out::println);
+
+        //busqueda de episodios a partir de x año
+        System.out.print("Indica el año a partir del cual deseas ver los episodios: ");
+        var fecha = sc.nextInt();
+        sc.nextLine();
+
+        LocalDate fechaBusqueda = LocalDate.of(fecha, 1, 1);
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MMMM/yyyy");
+
+        episodios.stream()
+                .filter(e -> e.getFecha() != null && e.getFecha().isAfter(fechaBusqueda))
+                .forEach(e -> {
+                    System.out.println("temporada " + e.getTemporada()
+                            + " Episodio " + e.getTitulo()
+                            + " Fecha de lanzamiento " + e.getFecha().format(dtf));
+                });
+
+
+    }//cierre metodo
 
 }//cierre clase
