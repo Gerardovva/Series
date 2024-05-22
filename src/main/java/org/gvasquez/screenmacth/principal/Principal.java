@@ -1,14 +1,10 @@
 package org.gvasquez.screenmacth.principal;
 
-import org.gvasquez.screenmacth.model.DatosEpisodio;
-import org.gvasquez.screenmacth.model.DatosSerie;
-import org.gvasquez.screenmacth.model.DatosTemporadas;
-import org.gvasquez.screenmacth.model.Episodio;
+import org.gvasquez.screenmacth.model.*;
+import org.gvasquez.screenmacth.repository.SerieRepository;
 import org.gvasquez.screenmacth.service.ConsumoApi;
 import org.gvasquez.screenmacth.service.ConvierteDatos;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -16,12 +12,99 @@ public class Principal {
 
     private Scanner sc = new Scanner(System.in);
     private ConsumoApi consumoApi = new ConsumoApi();
-
-    private final String URL_BASE = "https://www.omdbapi.com/?t=";
-    private final String API_KEY = "&apikey=4fc7c187";
     private ConvierteDatos conversor = new ConvierteDatos();
+    private List<DatosSerie> datosSeries = new ArrayList<>();
+    private SerieRepository repositorio;
+
+    private final static String URL_BASE = "https://www.omdbapi.com/?t=";
+    private final static String API_KEY = "&apikey=4fc7c187";
+
+    public Principal(SerieRepository repository) {
+        this.repositorio = repository;
+    }
+
 
     public void muestraElMenu() {
+        var opcion = -1;
+        while (opcion != 0) {
+            var menu = """
+                    1.- Buscar serie
+                    2.- Buscar episodio
+                    3.- Mostrar series 
+                                        
+                    0.- Salir
+                    """;
+
+            System.out.println(menu);
+            opcion = sc.nextByte();
+            sc.nextLine();
+
+            switch (opcion) {
+                case 1:
+                    buscarSerieWeb();
+                    break;
+                case 2:
+                    buscarEpisodioPorSerie();
+                    break;
+                case 3:
+                    mostrarSerieBuscadas();
+                    break;
+                case 0:
+                    System.out.println("Cerreando la aplicacion");
+                    break;
+                default:
+                    System.out.println("Opcion invalida");
+            }
+        }
+    }
+
+
+    //busca los datos generales de las series
+    private DatosSerie getDatosSerie() {
+        System.out.print("Escribe el nombre de la erie que desas buscar: ");
+        String nombreSerie = sc.nextLine();
+        var json = consumoApi.obtenerDatos(URL_BASE + nombreSerie.replace(" ", "+") + API_KEY);
+        System.out.println(json);
+        DatosSerie datos = conversor.obtenerDatos(json, DatosSerie.class);
+        return datos;
+    }
+
+    private void buscarEpisodioPorSerie() {
+        DatosSerie datosSerie = getDatosSerie();
+        List<DatosTemporadas> temporadas = new ArrayList<>();
+        for (int i = 1; i <= datosSerie.totalDeTemporadas(); i++) {
+            var json = consumoApi.obtenerDatos(URL_BASE + datosSerie.titulo().replace(" ", "+") + API_KEY);
+            DatosTemporadas datosTemporadas = conversor.obtenerDatos(json, DatosTemporadas.class);
+            temporadas.add(datosTemporadas);
+        }
+        temporadas.forEach(System.out::println);
+    }
+
+    private void buscarSerieWeb() {
+        DatosSerie datos = getDatosSerie();
+        // datosSeries.add(datos);
+        Serie serie = new Serie(datos);
+        repositorio.save(serie);
+        System.out.println(datos);
+
+    }
+
+    private void mostrarSerieBuscadas() {
+        /*List<Serie> series = new ArrayList<>();
+        series = datosSeries.stream()
+                .map(d -> new Serie(d))
+                .collect(Collectors.toList());*/
+        List<Serie> series=repositorio.findAll();
+
+        series.stream()
+                .sorted(Comparator.comparing(Serie::getGenero))
+                .forEach(System.out::println);
+    }
+
+
+}//cierre clase
+
+/* public void muestraElMenu() {
         System.out.print("Escribe el nombre de la erie que desas buscar: ");
         //busca los datos generales de las series
         String nombreSerie = sc.nextLine();
@@ -120,6 +203,4 @@ public class Principal {
         System.out.println("Episodio peor evaluado "+est.getMin());
 
 
-    }//cierre metodo
-
-}//cierre clase
+    }*/
