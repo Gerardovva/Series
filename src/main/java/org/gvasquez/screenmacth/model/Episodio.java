@@ -1,14 +1,33 @@
 package org.gvasquez.screenmacth.model;
 
+import jakarta.persistence.*;
+
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 
+@Entity
+@Table(name = "episodios")
 public class Episodio {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
     private Integer temporada;
+
     private String titulo;
+
     private Integer numeroEpisodio;
+
     private Double evaluacion;
+
     private LocalDate fechaDeLanzamiento;
+
+    @ManyToOne
+    private Serie serie;
+
+    public Episodio() {
+    }
 
     public Episodio(Integer numero, DatosEpisodio d) {
         this.temporada = numero;
@@ -20,10 +39,18 @@ public class Episodio {
             this.evaluacion = 0.0;
         }
         try {
-            this.fechaDeLanzamiento = LocalDate.parse(d.fechaLanzamiento());
+            this.fechaDeLanzamiento = LocalDate.parse(d.fechaDeLanzamiento());
         } catch (DateTimeParseException e) {
             this.fechaDeLanzamiento = null;
         }
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public Integer getTemporada() {
@@ -58,21 +85,29 @@ public class Episodio {
         this.evaluacion = evaluacion;
     }
 
-    public LocalDate getFecha() {
+    public LocalDate getFechaDeLanzamiento() {
         return fechaDeLanzamiento;
     }
 
-    public void setFecha(LocalDate fecha) {
-        this.fechaDeLanzamiento = fecha;
+    public void setFechaDeLanzamiento(LocalDate fechaDeLanzamiento) {
+        this.fechaDeLanzamiento = fechaDeLanzamiento;
+    }
+
+    public Serie getSerie() {
+        return serie;
+    }
+
+    public void setSerie(Serie serie) {
+        this.serie = serie;
     }
 
     @Override
     public String toString() {
         return
-                "temporada=" + temporada +
-                        ", tirulo='" + titulo + '\'' +
-                        ", numeroEpisodio=" + numeroEpisodio +
-                        ", evaluación=" + evaluacion +
-                        ", fechaDeLanzamiento=" + fechaDeLanzamiento;
+                "Temporada = " + temporada +
+                        "Titulo = " + titulo +
+                        "Numero de episodio = " + numeroEpisodio +
+                        "Evaluación = " + evaluacion +
+                        "Fecha de lanzamiento = " + fechaDeLanzamiento;
     }
 }

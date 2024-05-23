@@ -15,6 +15,7 @@ public class Principal {
     private ConvierteDatos conversor = new ConvierteDatos();
     private List<DatosSerie> datosSeries = new ArrayList<>();
     private SerieRepository repositorio;
+    private List<Serie> series;
 
     private final static String URL_BASE = "https://www.omdbapi.com/?t=";
     private final static String API_KEY = "&apikey=4fc7c187";
@@ -30,7 +31,7 @@ public class Principal {
             var menu = """
                     1.- Buscar serie
                     2.- Buscar episodio
-                    3.- Mostrar series 
+                    3.- Mostrar series buscadas
                                         
                     0.- Salir
                     """;
@@ -50,10 +51,10 @@ public class Principal {
                     mostrarSerieBuscadas();
                     break;
                 case 0:
-                    System.out.println("Cerreando la aplicacion");
+                    System.out.println("Cerrando la aplicación");
                     break;
                 default:
-                    System.out.println("Opcion invalida");
+                    System.out.println("Opción invalida");
             }
         }
     }
@@ -61,7 +62,7 @@ public class Principal {
 
     //busca los datos generales de las series
     private DatosSerie getDatosSerie() {
-        System.out.print("Escribe el nombre de la erie que desas buscar: ");
+        System.out.print("Escribe el nombre de la serie que desas buscar: ");
         String nombreSerie = sc.nextLine();
         var json = consumoApi.obtenerDatos(URL_BASE + nombreSerie.replace(" ", "+") + API_KEY);
         System.out.println(json);
@@ -70,14 +71,48 @@ public class Principal {
     }
 
     private void buscarEpisodioPorSerie() {
-        DatosSerie datosSerie = getDatosSerie();
-        List<DatosTemporadas> temporadas = new ArrayList<>();
-        for (int i = 1; i <= datosSerie.totalDeTemporadas(); i++) {
-            var json = consumoApi.obtenerDatos(URL_BASE + datosSerie.titulo().replace(" ", "+") + API_KEY);
-            DatosTemporadas datosTemporadas = conversor.obtenerDatos(json, DatosTemporadas.class);
-            temporadas.add(datosTemporadas);
+        mostrarSerieBuscadas();
+
+        System.out.print("Escribe el nombre de la serie que quieres ver el episodio: ");
+        var nombreSerie = sc.nextLine();
+
+        Optional<Serie> serie = series.stream()
+                .filter(s -> s.getTitulo().toLowerCase().contains(nombreSerie.toLowerCase()))
+                .findFirst();
+
+        if (serie.isPresent()) {
+            var serieEncontrada = serie.get();
+            List<DatosTemporadas> temporadas = new ArrayList<>();
+
+            for (int i = 1; i <= serieEncontrada.getTotalDeTemporadas(); i++) {
+
+                var json = consumoApi.obtenerDatos(URL_BASE + serieEncontrada.getTitulo().replace(" ", "+") + "&season=" + i + API_KEY);
+                DatosTemporadas datosTemporada = conversor.obtenerDatos(json, DatosTemporadas.class);
+                temporadas.add(datosTemporada);
+            }
+            temporadas.forEach(System.out::println);
+
+            List<Episodio> episodios = temporadas.stream()
+                    .flatMap(d -> d.episodios().stream()
+                            .map(e -> new Episodio(d.numero(), e)))
+                    .collect(Collectors.toList());
+
+
+            serieEncontrada.setEpisodios(episodios);
+            repositorio.save(serieEncontrada);
         }
-        temporadas.forEach(System.out::println);
+
+
+       /* DatosSerie datosSerie = getDatosSerie();
+        List<DatosTemporadas> temporadas = new ArrayList<>();
+        for (int i = 1; i <= datosSerie.totalTemporadas(); i++) {
+
+            var json = consumoApi.obtenerDatos(URL_BASE + datosSerie.titulo().replace(" ", "+") + "&season=" + i + API_KEY);
+            DatosTemporadas datosTemporada = conversor.obtenerDatos(json, DatosTemporadas.class);
+            temporadas.add(datosTemporada);
+        }
+        temporadas.forEach(System.out::println);*/
+
     }
 
     private void buscarSerieWeb() {
@@ -94,7 +129,7 @@ public class Principal {
         series = datosSeries.stream()
                 .map(d -> new Serie(d))
                 .collect(Collectors.toList());*/
-        List<Serie> series=repositorio.findAll();
+        this.series = repositorio.findAll();
 
         series.stream()
                 .sorted(Comparator.comparing(Serie::getGenero))

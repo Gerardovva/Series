@@ -13,12 +13,12 @@ public enum Categoria {
         this.categoriaOmdb = categoriaOmdb;
     }
 
-    public static Categoria fromString(String text) throws IllegalAccessException {
+    public static Categoria fromString(String text)  {
         for (Categoria categoria : Categoria.values()) {
             if (categoria.categoriaOmdb.equalsIgnoreCase(text)) {
                 return categoria;
             }
         }
-        throw new IllegalAccessException("Ninguna categoria encontrada: " + text);
+        throw new IllegalArgumentException("Ninguna categoría encontrada: " + text);
     }
 }

@@ -18,6 +18,7 @@ import java.util.List;
 
 @SpringBootApplication
 public class ScreenmacthApplication implements CommandLineRunner {
+
     @Autowired
     private SerieRepository repository;
 

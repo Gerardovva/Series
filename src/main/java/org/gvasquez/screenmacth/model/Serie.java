@@ -1,15 +1,14 @@
 package org.gvasquez.screenmacth.model;
 
-import com.fasterxml.jackson.annotation.JsonAlias;
 import jakarta.persistence.*;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.OptionalDouble;
 
 @Entity
-@Table(name="series")
+@Table(name = "series")
 public class Serie {
+
     //atributos
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,24 +30,20 @@ public class Serie {
 
     private String sinopsis;
 
-    @Transient
+    //@Transient //no se preocupa por la relacion
+    @OneToMany(mappedBy = "serie", cascade = CascadeType.ALL,fetch = FetchType.EAGER)
     private List<Episodio> episodios;
 
     //constructor
-    public Serie(){
-
+    public Serie() {
     }
 
     public Serie(DatosSerie datosSerie) {
         this.titulo = datosSerie.titulo();
-        this.totalDeTemporadas = datosSerie.totalDeTemporadas();
-        this.evaluacion = OptionalDouble.of(Double.parseDouble(datosSerie.evaluacion())).orElse(0);
+        this.totalDeTemporadas = datosSerie.totalTemporadas();
+        this.evaluacion = OptionalDouble.of(Double.valueOf(datosSerie.evaluacion())).orElse(0);
         this.poster = datosSerie.poster();
-        try {
-            this.genero = Categoria.fromString(datosSerie.genero().split(",")[0].trim());
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
-        }
+        this.genero = Categoria.fromString(datosSerie.genero().split(",")[0].trim());
         this.actores = datosSerie.actores();
         this.sinopsis = datosSerie.sinopsis();
 
@@ -121,15 +116,25 @@ public class Serie {
         this.sinopsis = sinopsis;
     }
 
+    public List<Episodio> getEpisodios() {
+        return episodios;
+    }
+
+    public void setEpisodios(List<Episodio> episodios) {
+        episodios.forEach(e -> e.setSerie(this));
+        this.episodios = episodios;
+    }
+
     @Override
     public String toString() {
-        return "\t\n******** Resultados ********\n\n"+
-                "Genero = " + genero +"\n"+
-                "Titulo = " + titulo +"\n"+
-                "Total De Temporadas = " + totalDeTemporadas +"\n"+
-                "Evaluación = " + evaluacion +"\n"+
-                "Poster = " + poster +"\n"+
-                "Actores = " + actores +"\n"+
-                "Sinopsis = " + sinopsis +"\t\n\n************************** \n\n";
+        return "\t\n******** Resultados ********\n" +
+                "Genero = " + genero + "\n" +
+                "Titulo = " + titulo + "\n" +
+                "Total De Temporadas = " + totalDeTemporadas + "\n" +
+                "Evaluación = " + evaluacion + "\n" +
+                "Poster = " + poster + "\n" +
+                "Actores = " + actores + "\n" +
+                "Sinopsis = " + sinopsis +"\n"+
+                "Episodios = " + episodios;
     }
 }
