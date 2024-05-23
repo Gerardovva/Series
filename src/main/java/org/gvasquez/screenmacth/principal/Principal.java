@@ -32,6 +32,9 @@ public class Principal {
                     1.- Buscar serie
                     2.- Buscar episodio
                     3.- Mostrar series buscadas
+                    4.- Buscar series por titulo
+                    5.- Top 5 mejores Series
+                    6.- Buscar serie por categoría
                                         
                     0.- Salir
                     """;
@@ -49,6 +52,15 @@ public class Principal {
                     break;
                 case 3:
                     mostrarSerieBuscadas();
+                    break;
+                case 4:
+                    buscarSeriesPorTitulo();
+                    break;
+                case 5:
+                    buscarTop5Series();
+                    break;
+                case 6:
+                    buscarSeriePorCategoria();
                     break;
                 case 0:
                     System.out.println("Cerrando la aplicación");
@@ -134,6 +146,35 @@ public class Principal {
         series.stream()
                 .sorted(Comparator.comparing(Serie::getGenero))
                 .forEach(System.out::println);
+    }
+
+    private void buscarSeriesPorTitulo() {
+        System.out.println("Escribe el nombre de la serie que deseas buscar: ");
+        String nombreSerie = sc.nextLine();
+
+        Optional<Serie> serieBuscada = repositorio.findByTituloContainsIgnoreCase(nombreSerie);
+
+        if (serieBuscada.isPresent()) {
+            System.out.println("La serie buscada es:  " + serieBuscada.get());
+        } else {
+            System.out.println("Serie no encontrada");
+        }
+
+    }
+
+    private void buscarTop5Series() {
+        List<Serie> topSeries = repositorio.findTop5ByOrderByEvaluacionDesc();
+        topSeries.forEach(s -> System.out.println("Serie: " + s.getTitulo() + ", Evaluacíon: " + s.getEvaluacion()));
+    }
+
+    private void buscarSeriePorCategoria() {
+        System.out.println("Escriba el genero/categoria de la serie que desea buscar: ");
+        String genero = sc.nextLine();
+        var categoria = Categoria.fromEspanol(genero);
+
+        List<Serie> seriePorCategoria = repositorio.findByGenero(categoria);
+        System.out.println("Las series de la categoria: " + genero);
+        seriePorCategoria.forEach(System.out::println);
     }
 
 
