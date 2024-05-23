@@ -1,4 +1,4 @@
-package org.gvasquez.screenmacth;
+/*package org.gvasquez.screenmacth;
 
 import org.gvasquez.screenmacth.principal.Principal;
 import org.gvasquez.screenmacth.repository.SerieRepository;
@@ -24,4 +24,4 @@ public class ScreenmacthApplicationConsola implements CommandLineRunner {
     }
 
 
-}//cierre clase
+}//cierre clase */
