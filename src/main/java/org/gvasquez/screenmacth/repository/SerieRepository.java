@@ -1,5 +1,6 @@
 package org.gvasquez.screenmacth.repository;
 
+import org.gvasquez.screenmacth.dto.EpisodioDTO;
 import org.gvasquez.screenmacth.model.Categoria;
 import org.gvasquez.screenmacth.model.Episodio;
 import org.gvasquez.screenmacth.model.Serie;
@@ -27,6 +28,9 @@ public interface SerieRepository extends JpaRepository<Serie,Long> {
    @Query("SELECT e FROM Serie s JOIN s.episodios e WHERE s = :serie ORDER BY e.evaluacion DESC LIMIT 5")
    List<Episodio> top5Episodios(Serie serie);
 
+   @Query("SELECT s FROM Serie s " +"JOIN s.episodios e "+ "GROUP BY s "+"ORDER BY MAX(e.fechaDeLanzamiento) DESC LIMIT 5")
+   List<Serie> lanzamientsoMasRecientes();
 
-
+   @Query("SELECT e FROM Serie s JOIN s.episodios e WHERE s.id = :id AND e.temporada = :numeroTemporada")
+   List<Episodio> obtenerTemporadasPorNumero(long id, long numeroTemporada);
 }
