@@ -13,7 +13,7 @@ public class Principal {
     private Scanner sc = new Scanner(System.in);
     private ConsumoApi consumoApi = new ConsumoApi();
     private ConvierteDatos conversor = new ConvierteDatos();
-    private List<DatosSerie> datosSeries = new ArrayList<>();
+    //private List<DatosSerie> datosSeries = new ArrayList<>();
     private SerieRepository repositorio;
     private List<Serie> series;
     private Optional<Serie>  serieBuscada;
@@ -27,9 +27,9 @@ public class Principal {
 
 
     public void muestraElMenu() {
-        var opcion = -1;
+        int opcion = -1;
         while (opcion != 0) {
-            var menu = """
+            String  menu = """
                     1.- Buscar serie
                     2.- Buscar episodio
                     3.- Mostrar series buscadas
@@ -90,7 +90,7 @@ public class Principal {
     private DatosSerie getDatosSerie() {
         System.out.print("Escribe el nombre de la serie que desas buscar: ");
         String nombreSerie = sc.nextLine();
-        var json = consumoApi.obtenerDatos(URL_BASE + nombreSerie.replace(" ", "+") + API_KEY);
+        String json = consumoApi.obtenerDatos(URL_BASE + nombreSerie.replace(" ", "+") + API_KEY);
         System.out.println(json);
         DatosSerie datos = conversor.obtenerDatos(json, DatosSerie.class);
         return datos;
@@ -100,7 +100,7 @@ public class Principal {
         mostrarSerieBuscadas();
 
         System.out.print("Escribe el nombre de la serie que quieres ver el episodio: ");
-        var nombreSerie = sc.nextLine();
+        String  nombreSerie = sc.nextLine();
 
         Optional<Serie> serie = series.stream()
                 .filter(s -> s.getTitulo().toLowerCase().contains(nombreSerie.toLowerCase()))

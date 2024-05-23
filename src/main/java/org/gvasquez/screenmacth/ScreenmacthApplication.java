@@ -17,20 +17,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 @SpringBootApplication
-public class ScreenmacthApplication implements CommandLineRunner {
-
-    @Autowired
-    private SerieRepository repository;
+public class ScreenmacthApplication {
 
     public static void main(String[] args) {
         SpringApplication.run(ScreenmacthApplication.class, args);
     }
-
-    @Override
-    public void run(String... args) throws Exception {
-        Principal principal= new Principal(repository);
-        principal.muestraElMenu();
-    }
-
-
 }//cierre clase
